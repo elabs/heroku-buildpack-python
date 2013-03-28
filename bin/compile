@@ -29,6 +29,7 @@ DEFAULT_PYTHON_VERSION="python-2.7.3"
 PYTHON_EXE="/app/.heroku/python/bin/python"
 PIP_VERSION="1.3.1"
 DISTRIBUTE_VERSION="0.6.35"
+VENDORED_NODE="https://s3.amazonaws.com/language-pack-ruby/node-0.4.7.tgz"
 
 # Sanitizing environment variables.
 unset GIT_DIR PYTHONHOME PYTHONPATH LD_LIBRARY_PATH LIBRARY_PATH
@@ -149,6 +150,13 @@ fi
 
 set -e
 hash -r
+
+if (grep -v ^# requirements.txt | grep -Fiq "pyexecjs=" requirements.txt)
+then
+    echo "-----> Noticed pyexecjs. Bootstrapping node."
+
+    curl -L -s $VENDORED_NODE | tar -zx -C bin
+fi
 
 # Pylibmc support.
 # See [`bin/steps/pylibmc`](pylibmc.html).
